@@ -10,22 +10,26 @@
           >Roll</button>
         </div>
         <div class="player1 dice-container">
-          <button v-for="index in 9"
-            :class="index"
+          <button v-for="(dice, i) in player1Board"
+            :key="`player1-${i}`"
+            :class="`${i}`"
+            :disabled="dice !== ''"
             @click="setRollOnBoard"
-          ></button>
+          >{{ dice }}</button>
         </div>
         <div class="player2 throw-container">
           <button
             :disabled="player1Turn"
             @click="rollDice"
-          >Roll</button>
+          >Wait</button>
         </div>
         <div class="player2 dice-container">
-          <button v-for="index in 9"
-            :class="index"
+          <button v-for="(dice, i) in player2Board"
+            :key="`player2-${i}`"
+            :class="`${i}`"
+            :disabled="dice !== ''"
             @click="setRollOnBoard"
-          ></button>
+          >{{ dice }}</button>
         </div>
       </div>
     </div>
@@ -38,15 +42,17 @@ export default {
   methods: {
     toggleTurn: function () {
       this.player1Turn = !this.player1Turn;
-      this.setActivePlayerBoard();
     },
     setActivePlayerBoard: function () {
-      const player = this.player1Turn ? `1` : `2`;
-      this.currentButton = document.querySelector(`.player${player}.throw-container > button`);
-      this.currentSection = document.querySelector(`.player${player}.dice-container`);
+      this.currentButton = document.querySelector(`.player${this.player}.throw-container > button`);
+      this.currentSection = document.querySelector(`.player${this.player}.dice-container`);
       document.querySelectorAll(`.dice-container`).forEach((container) => {
         container.inert = true;
       });
+      this.currentButton.innerHTML = 'Roll';
+    },
+    setActivePlayerRoll: function () {
+      this.currentButton.innerHTML = 'Wait';
     },
     rollDice: function () {
       const roll = Math.floor(Math.random() * (7 - 1) + 1);
@@ -56,28 +62,40 @@ export default {
     },
     setRollOnBoard: function (e) {
       const dice = e.target;
-      dice.innerHTML = this.currentRoll;
-      dice.disabled = true;
+      const index = dice.className;
+
+      if (this.player1Turn) {
+        this.player1Board[index] = this.currentRoll;
+      } else {
+        this.player2Board[index] = this.currentRoll;
+      }
+
+      // dice.disabled = true;
       this.rolled = false;
       this.toggleTurn();
     }
   },
   data() {
-    // Set 2D array to update when roll set & pull data into buttons on array update
     return {
       player1Turn: true,
+      player: `1`,
       rolled: false,
       currentRoll: null,
       currentButton: null,
       currentSection: null,
-      player1Board: [['', '', ''], ['', '', ''], ['', '', '']],
-      player2Board: [['', '', ''], ['', '', ''], ['', '', '']]
+      player1Board: ['', '', '', '', '', '', '', '', ''],
+      player2Board: ['', '', '', '', '', '', '', '', '']
     };
   },
   mounted() {
     this.setActivePlayerBoard();
   },
   watch: {
+    player1Turn: function () {
+      this.setActivePlayerRoll();
+      this.player = this.player1Turn ? `1` : `2`;
+      this.setActivePlayerBoard();
+    },
     rolled: function () {
       this.currentButton.disabled = true;
       this.currentSection.inert = !this.rolled;
