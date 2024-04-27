@@ -1,6 +1,7 @@
 <script setup>
 import GameEnd from './components/GameEnd.vue';
 import ThrowContainer from './components/ThrowContainer.vue';
+import DiceContainer from './components/DiceContainer.vue';
 </script>
 
 <template>
@@ -17,34 +18,30 @@ import ThrowContainer from './components/ThrowContainer.vue';
       <div class="game-container">
         <ThrowContainer
           :class="'player1'"
-          :rollDisabled="!player1Turn"
+          :rollDisabled="!player1Turn || rolled"
           :turn="player1Turn"
           :score="player1Score"
           @onRoll="rollDice"
         />
-        <div class="player1 dice-container">
-          <button v-for="(dice, i) in player1Board"
-            :key="`player1-${i}`"
-            :class="`${i}`"
-            :disabled="dice !== ''"
-            @click="setRollOnBoard"
-          >{{ dice }}</button>
-        </div>
+        <DiceContainer
+          :class="'player1'"
+          :setRollEnabled="player1Turn && rolled"
+          :board="player1Board"
+          @onSetRoll="setRollOnBoard"
+        />
         <ThrowContainer
           :class="'player2'"
-          :rollDisabled="player1Turn"
+          :rollDisabled="player1Turn || rolled"
           :turn="!player1Turn"
           :score="player2Score"
           @onRoll="rollDice"
         />
-        <div class="player2 dice-container">
-          <button v-for="(dice, i) in player2Board"
-            :key="`player2-${i}`"
-            :class="`${i}`"
-            :disabled="dice !== ''"
-            @click="setRollOnBoard"
-          >{{ dice }}</button>
-        </div>
+        <DiceContainer
+          :class="'player2'"
+          :setRollEnabled="!player1Turn && rolled"
+          :board="player2Board"
+          @onSetRoll="setRollOnBoard"
+        />
       </div>
     </div>
   </div>
@@ -54,47 +51,47 @@ import ThrowContainer from './components/ThrowContainer.vue';
 export default {
   name: 'App',
   methods: {
-    toggleTurn: function () {
+    toggleTurn() {
+      // Toggle between players & set rolled = false
       this.player1Turn = !this.player1Turn;
+      this.rolled = false;
     },
-    setActivePlayerBoard: function () {
-      this.currentButton = document.querySelector(`.player${this.player}.throw-container > button`);
-      this.currentSection = document.querySelector(`.player${this.player}.dice-container`);
-      document.querySelectorAll(`.dice-container`).forEach((container) => {
-        container.inert = true;
-      });
-    },
-    rollDice: function (roll) {
+    rollDice(roll) {
+      // Set passed roll as the current roll & set rolled = true
       this.currentRoll = roll;
       this.rolled = true;
     },
-    setRollOnBoard: function (e) {
-      const dice = e.target;
-      const i = dice.className;
-      const column = this.getColumn(i);
+    setRollOnBoard(diceIndex) {
+      // Use passed index of the dice to retrieve the column
+      const column = this.getColumnNumber(diceIndex);
 
+      // Update board with structuredClone to ensure change is reacted to
+      // Check for any duplicate die in the opponent's matching column & remove them
       if (this.player1Turn) {
-        this.player1Board[i] = this.currentRoll;
-        this.checkColumn(column, this.player2Board);
+        const updatedBoard = structuredClone(this.player1Board);
+        updatedBoard[diceIndex] = this.currentRoll;
+        this.player1Board = updatedBoard;
+        this.player2Board = this.removeOpponentColumnDuplicates(column, this.player2Board);
       } else {
-        this.player2Board[i] = this.currentRoll;
-        this.checkColumn(column, this.player1Board);
+        const updatedBoard = structuredClone(this.player2Board);
+        updatedBoard[diceIndex] = this.currentRoll;
+        this.player2Board = updatedBoard;
+        this.player1Board = this.removeOpponentColumnDuplicates(column, this.player1Board);
       }
+
+      // Calculate new scores after all board updates
       this.player1Score = this.setScore(this.player1Board);
       this.player2Score = this.setScore(this.player2Board);
-      this.rolled = false;
 
+      // Check for game end & toggle turn if game continues
       if (this.player1Board) {
         this.gameOver = this.checkGameEnd(this.player1Board);
       } else {
         this.gameOver = this.checkGameEnd(this.player2Board);
       }
-
-      if (!this.gameOver) {
-        this.toggleTurn();
-      }
+      this.toggleTurn();
     },
-    getColumn: function (i) {
+    getColumnNumber (i) {
       switch (parseInt(i)) {
         case 0:
         case 3:
@@ -110,12 +107,14 @@ export default {
           return 2;
       }
     },
-    checkColumn: function (column, board) {
-      for (let i = column; i < board.length; i += 3) {
-        if (board[i] === this.currentRoll) {
-          board[i] = '';
+    removeOpponentColumnDuplicates (column, board) {
+      const updatedBoard = structuredClone(board);
+      for (let i = column; i < updatedBoard.length; i += 3) {
+        if (updatedBoard[i] === this.currentRoll) {
+          updatedBoard[i] = '';
         }
       }
+      return updatedBoard;
     },
     setScore(board) {
       const getMap = (startIndex) => {
@@ -142,18 +141,17 @@ export default {
       return score;
     },
     checkGameEnd(board) {
-      return board.indexOf('') === -1;
+      return board.indexOf('') !== 0;
     },
     resetGame() {
-      this.player1Turn = true;
       this.rolled = false;
+      this.player1Turn = true;
       this.currentRoll = null;
-      this.player1Board = ['', '', '', '', '', '', '', '', ''];
-      this.player2Board = ['', '', '', '', '', '', '', '', ''];
       this.player1Score = 0;
       this.player2Score = 0;
+      this.player1Board = ['', '', '', '', '', '', '', '', ''];
+      this.player2Board = ['', '', '', '', '', '', '', '', ''];
       this.gameOver = false;
-      this.setActivePlayerBoard();
     }
   },
   data() {
@@ -162,8 +160,6 @@ export default {
       player: `1`,
       rolled: false,
       currentRoll: null,
-      currentButton: null,
-      currentSection: null,
       player1Board: ['', '', '', '', '', '', '', '', ''],
       player2Board: ['', '', '', '', '', '', '', '', ''],
       player1Score: 0,
@@ -172,19 +168,11 @@ export default {
       winner: null
     };
   },
-  mounted() {
-    this.setActivePlayerBoard();
-  },
   watch: {
-    player1Turn: function () {
+    player1Turn() {
       this.player = this.player1Turn ? `1` : `2`;
-      this.setActivePlayerBoard();
     },
-    rolled: function () {
-      this.currentButton.disabled = true;
-      this.currentSection.inert = !this.rolled;
-    },
-    gameOver: function () {
+    gameOver() {
       document.querySelector('.game-container').inert = this.gameOver;
       if (!this.gameOver) {
         return;

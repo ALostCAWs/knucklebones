@@ -18,7 +18,7 @@ export default {
     score: { required: true }
   },
   methods: {
-    roll: function () {
+    roll() {
       const roll = Math.floor(Math.random() * (7 - 1) + 1);
       this.rollButtonText = roll;
       this.$emit('onRoll', roll);

@@ -18,7 +18,7 @@ export default {
     winner: { required: true },
   },
   methods: {
-    reset: function () {
+    reset() {
       this.$emit('onReset');
     }
   }
