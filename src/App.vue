@@ -5,23 +5,25 @@
       <div class="game-container">
         <div class="player1 throw-container">
           <button
-          :disabled="!player1Turn"
+            :disabled="!player1Turn"
             @click="rollDice"
           >Roll</button>
         </div>
         <div class="player1 dice-container">
           <button v-for="index in 9"
+            :class="index"
             @click="setRollOnBoard"
           ></button>
         </div>
         <div class="player2 throw-container">
           <button
-          :disabled="player1Turn"
+            :disabled="player1Turn"
             @click="rollDice"
           >Roll</button>
         </div>
         <div class="player2 dice-container">
           <button v-for="index in 9"
+            :class="index"
             @click="setRollOnBoard"
           ></button>
         </div>
@@ -55,17 +57,21 @@ export default {
     setRollOnBoard: function (e) {
       const dice = e.target;
       dice.innerHTML = this.currentRoll;
+      dice.disabled = true;
       this.rolled = false;
       this.toggleTurn();
     }
   },
   data() {
+    // Set 2D array to update when roll set & pull data into buttons on array update
     return {
       player1Turn: true,
       rolled: false,
       currentRoll: null,
       currentButton: null,
-      currentSection: null
+      currentSection: null,
+      player1Board: [['', '', ''], ['', '', ''], ['', '', '']],
+      player2Board: [['', '', ''], ['', '', ''], ['', '', '']]
     };
   },
   mounted() {
@@ -107,14 +113,11 @@ button {
   color: var(--accent-color);
 }
 
-button:hover:not(:disabled) {
+button:hover:not(:disabled),
+.dice-container :disabled {
   border: thin solid var(--light-color);
   background-color: var(--accent-color);
-}
-
-.dice-container[inert] button,
-button:disabled {
-  background-color: red;
+  color: var(--accent-color-faded);
 }
 
 .game-container {
