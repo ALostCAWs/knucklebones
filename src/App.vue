@@ -143,7 +143,8 @@ export default {
       player1Board: ['', '', '', '', '', '', '', '', ''],
       player2Board: ['', '', '', '', '', '', '', '', ''],
       player1Score: 0,
-      player2Score: 0
+      player2Score: 0,
+      gameOver: false
     };
   },
   mounted() {
