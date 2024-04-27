@@ -269,7 +269,17 @@ button:hover:not(:disabled),
 }
 
 .throw-container {
+  display: flex;
+  flex-direction: column;
   margin: auto;
+}
+
+.throw-container button:first-of-type {
+  margin-top: 2.5em;
+}
+
+.throw-container button:last-of-type {
+  margin-top: 1em;
 }
 
 .gameOver {
