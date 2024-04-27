@@ -1,0 +1,99 @@
+/* Imports */
+@import url("normalize.css");
+
+/* Variables */
+:root {
+  /* Color Scheme */
+  --main-color: #232931;
+  --light-color: #404750;
+  --shade-color: rgb(23, 27, 30);
+  --accent-color: #4ecca3;
+  --accent-color-faded: #263631;
+  --overlay-color: rgba(34, 41, 49, 0.822);
+  --font-color: #f5f5f3;
+
+  /* Typography */
+  --main-font: "Roboto", sans-serif;
+  --main-font-fallback: sans-serif;
+  /* --accent-font: */
+  --main-font-wght: 500;
+
+  --base-size: .875rem;
+  --type-scale: 1.125;
+  /* Screen Sizes | L - Major 3rd - 1.25 | M - 1.2 Minor 3rd | S - 1.125 Major 2nd */
+  --p: calc(var(--base-size) * var(--type-scale));
+  --h6: calc(var(--p) * var(--type-scale));
+  --h5: calc(var(--h6) * var(--type-scale));
+  --h4: calc(var(--h5) * var(--type-scale));
+  --h3: calc(var(--h4) * var(--type-scale));
+  --h2: calc(var(--h3) * var(--type-scale));
+  --h1: calc(var(--h2) * var(--type-scale));
+}
+
+/* Assign typescale sizes */
+h1 {
+  font-size: var(--h1);
+}
+
+h2 {
+  font-size: var(--h2);
+}
+
+h3 {
+  font-size: var(--h3);
+}
+
+h4 {
+  font-size: var(--h4);
+}
+
+h5 {
+  font-size: var(--h5);
+}
+
+p {
+  font-size: var(--p);
+}
+
+h1, h2, h3, h4, h5, h6, p,
+input, select, button {
+  font-weight: var(--main-font-wght);
+  letter-spacing: .1em;
+  color: var(--font-color);
+}
+
+/* Reset, Border-Box, & Font-Var-Set */
+* {
+  position: relative;
+  margin: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+  font-variation-settings: "wght" var(--main-font-wght);
+  border: none;
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-color) var(--accent-color-faded);
+}
+
+html {
+  overflow-x: hidden;
+  overflow-y: scroll;
+  max-width: 100%;
+}
+
+body {
+  background-color: var(--main-color);
+  font-family: var(--main-font-fallback);
+  color: var(--font-color);
+}
+
+#app {
+  width: 100%;
+}
+
+/* Check Variable Font Support */
+@supports (font-variation-settings: "wght" 500) {
+  body {
+    font-family: var(--main-font);
+  }
+}
