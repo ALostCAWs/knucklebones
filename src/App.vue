@@ -1,16 +1,18 @@
+<script setup>
+import GameOver from './components/gameOver.vue';
+</script>
+
 <template>
   <div>
     <div class="page-wrapper">
       <h1 class="hiddenHeading">Knucklebones</h1>
-      <div v-if="gameOver" class="gameOver">
-        <div>
-          <h2>{{ winner }}</h2>
-          <h2>{{ player1Score }} - {{ player2Score }}</h2>
-          <button
-            @click="resetGame"
-          >Reset</button>
-        </div>
-      </div>
+      <GameOver
+        v-if="gameOver"
+        :player1Score="player1Score"
+        :player2Score="player2Score"
+        :winner="winner"
+        @onReset="resetGame"
+      />
       <div class="game-container">
         <div class="player1 throw-container">
           <button
@@ -252,7 +254,7 @@ button:hover:not(:disabled),
   grid-template-rows: 50% 50%;
 
   width: 90%;
-  height: 45vh;
+  height: 45%;
 }
 
 .dice-container {
@@ -280,26 +282,5 @@ button:hover:not(:disabled),
 
 .throw-container button:last-of-type {
   margin-top: 1em;
-}
-
-.gameOver {
-  z-index: 10;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-
-  background: rgb(28, 28, 28);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.486) 0%, rgba(28, 28, 28, 0.436) 100%);
-}
-
-.gameOver > div {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-
-  width: 100%;
-  height: 100%;
-  padding-bottom: 25em;
 }
 </style>
