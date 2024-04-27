@@ -26,7 +26,7 @@ export default {
 </script>
 
 <style>
-@import url('../styles/styles.css');
+@import url('../styles/variables.css');
 .gameOver {
   z-index: 10;
   position: absolute;
@@ -39,12 +39,16 @@ export default {
 .gameOver > div {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
 
   width: 100%;
   height: 100%;
-  padding-bottom: 20em;
+  padding-top: 10em;
+}
+
+.gameOver h2,
+.gameOver p {
+  color: var(--accent-color);
 }
 
 .gameOver p {

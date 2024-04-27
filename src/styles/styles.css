@@ -1,33 +1,9 @@
 /* Imports */
 @import url("normalize.css");
+@import url("variables.css");
 
-/* Variables */
-:root {
-  /* Color Scheme */
-  --main-color: #232931;
-  --light-color: #404750;
-  --shade-color: rgb(23, 27, 30);
-  --accent-color: #4ecca3;
-  --accent-color-faded: #263631;
-  --overlay-color: rgba(34, 41, 49, 0.822);
-  --font-color: #ffffff;
-
-  /* Typography */
-  --main-font: "Roboto", sans-serif;
-  --main-font-fallback: sans-serif;
-  /* --accent-font: */
-  --main-font-wght: 500;
-
-  --base-size: .875rem;
-  --type-scale: 1.125;
-  /* Screen Sizes | L - Major 3rd - 1.25 | M - 1.2 Minor 3rd | S - 1.125 Major 2nd */
-  --p: calc(var(--base-size) * var(--type-scale));
-  --h6: calc(var(--p) * var(--type-scale));
-  --h5: calc(var(--h6) * var(--type-scale));
-  --h4: calc(var(--h5) * var(--type-scale));
-  --h3: calc(var(--h4) * var(--type-scale));
-  --h2: calc(var(--h3) * var(--type-scale));
-  --h1: calc(var(--h2) * var(--type-scale));
+#app {
+  width: 100%;
 }
 
 /* Assign typescale sizes */
@@ -88,8 +64,25 @@ body {
   color: var(--font-color);
 }
 
-#app {
-  width: 100%;
+h1.hiddenHeading {
+  position: absolute;
+  padding: 0;
+  width: 1px;
+  height: 1px;
+  border: 0;
+  clip: rect(1px, 1px, 1px, 1px);
+  -webkit-clip-path: inset(0px 0px 99.9% 99.9%);
+  clip-path: inset(0px 0px 99.9% 99.9%);
+}
+
+button {
+  width: 5em;
+  height: 1.5em;
+  border: thin solid var(--accent-color);
+  border-radius: 5px;
+
+  background-color: var(--accent-color-faded);
+  color: var(--accent-color);
 }
 
 /* Check Variable Font Support */

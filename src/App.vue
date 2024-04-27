@@ -1,12 +1,13 @@
 <script setup>
-import GameOver from './components/gameOver.vue';
+import GameEnd from './components/GameEnd.vue';
+import ThrowContainer from './components/ThrowContainer.vue';
 </script>
 
 <template>
   <div>
     <div class="page-wrapper">
       <h1 class="hiddenHeading">Knucklebones</h1>
-      <GameOver
+      <GameEnd
         v-if="gameOver"
         :player1Score="player1Score"
         :player2Score="player2Score"
@@ -14,15 +15,13 @@ import GameOver from './components/gameOver.vue';
         @onReset="resetGame"
       />
       <div class="game-container">
-        <div class="player1 throw-container">
-          <button
-            :disabled="!player1Turn"
-            @click="rollDice"
-          >Roll</button>
-          <button
-            :disabled="true"
-          >{{ player1Score }}</button>
-        </div>
+        <ThrowContainer
+          :class="'player1'"
+          :rollDisabled="!player1Turn"
+          :turn="player1Turn"
+          :score="player1Score"
+          @onRoll="rollDice"
+        />
         <div class="player1 dice-container">
           <button v-for="(dice, i) in player1Board"
             :key="`player1-${i}`"
@@ -31,15 +30,13 @@ import GameOver from './components/gameOver.vue';
             @click="setRollOnBoard"
           >{{ dice }}</button>
         </div>
-        <div class="player2 throw-container">
-          <button
-            :disabled="player1Turn"
-            @click="rollDice"
-          >Wait</button>
-          <button
-            :disabled="true"
-          >{{ player2Score }}</button>
-        </div>
+        <ThrowContainer
+          :class="'player2'"
+          :rollDisabled="player1Turn"
+          :turn="!player1Turn"
+          :score="player2Score"
+          @onRoll="rollDice"
+        />
         <div class="player2 dice-container">
           <button v-for="(dice, i) in player2Board"
             :key="`player2-${i}`"
@@ -66,15 +63,9 @@ export default {
       document.querySelectorAll(`.dice-container`).forEach((container) => {
         container.inert = true;
       });
-      this.currentButton.innerHTML = 'Roll';
     },
-    setActivePlayerRoll: function () {
-      this.currentButton.innerHTML = 'Wait';
-    },
-    rollDice: function () {
-      const roll = Math.floor(Math.random() * (7 - 1) + 1);
+    rollDice: function (roll) {
       this.currentRoll = roll;
-      this.currentButton.innerHTML = this.currentRoll;
       this.rolled = true;
     },
     setRollOnBoard: function (e) {
@@ -186,7 +177,6 @@ export default {
   },
   watch: {
     player1Turn: function () {
-      this.setActivePlayerRoll();
       this.player = this.player1Turn ? `1` : `2`;
       this.setActivePlayerBoard();
     },
@@ -214,27 +204,7 @@ export default {
 </script>
 
 <style>
-@import url('./styles/styles.css');
-h1.hiddenHeading {
-  position: absolute;
-  padding: 0;
-  width: 1px;
-  height: 1px;
-  border: 0;
-  clip: rect(1px, 1px, 1px, 1px);
-  -webkit-clip-path: inset(0px 0px 99.9% 99.9%);
-  clip-path: inset(0px 0px 99.9% 99.9%);
-}
-
-button {
-  width: 5em;
-  height: 1.5em;
-  border: thin solid var(--accent-color);
-  border-radius: 5px;
-
-  background-color: var(--accent-color-faded);
-  color: var(--accent-color);
-}
+@import url('./styles/variables.css');
 
 button:hover:not(:disabled),
 .dice-container :disabled {
@@ -268,19 +238,5 @@ button:hover:not(:disabled),
 
 .dice-container button {
   margin: auto;
-}
-
-.throw-container {
-  display: flex;
-  flex-direction: column;
-  margin: auto;
-}
-
-.throw-container button:first-of-type {
-  margin-top: 2.5em;
-}
-
-.throw-container button:last-of-type {
-  margin-top: 1em;
 }
 </style>
