@@ -8,6 +8,9 @@
             :disabled="!player1Turn"
             @click="rollDice"
           >Roll</button>
+          <button
+            :disabled="true"
+          >{{ player1Score }}</button>
         </div>
         <div class="player1 dice-container">
           <button v-for="(dice, i) in player1Board"
@@ -22,6 +25,9 @@
             :disabled="player1Turn"
             @click="rollDice"
           >Wait</button>
+          <button
+            :disabled="true"
+          >{{ player2Score }}</button>
         </div>
         <div class="player2 dice-container">
           <button v-for="(dice, i) in player2Board"
@@ -72,6 +78,8 @@ export default {
         this.player2Board[i] = this.currentRoll;
         this.checkColumn(column, this.player1Board);
       }
+      this.player1Score = this.setScore(this.player1Board);
+      this.player2Score = this.setScore(this.player2Board);
 
       this.rolled = false;
       this.toggleTurn();
@@ -93,16 +101,35 @@ export default {
       }
     },
     checkColumn: function (column, board) {
-      console.log(column);
-      console.log(this.currentRoll);
-      console.log(board);
       for (let i = column; i < board.length; i += 3) {
-        console.log(i);
         if (board[i] === this.currentRoll) {
           board[i] = '';
         }
       }
-      console.log(board);
+    },
+    setScore(board) {
+      const getMap = (startIndex) => {
+        const column = new Map();
+        for (let i = startIndex; i < board.length; i += 3) {
+          const dice = parseInt(board[i]) || 0;
+          column.set(dice, (column.get(dice) || 0) + 1);
+        }
+        return column;
+      }
+      const addColumnScoreToScore = (column) => {
+        for (const [key, value] of column.entries()) {
+          score += ((key * value) * value);
+        }
+      }
+
+      let score = 0;
+      const column0 = getMap(0);
+      const column1 = getMap(1);
+      const column2 = getMap(2);
+      addColumnScoreToScore(column0);
+      addColumnScoreToScore(column1);
+      addColumnScoreToScore(column2);
+      return score;
     }
   },
   data() {
@@ -115,9 +142,8 @@ export default {
       currentSection: null,
       player1Board: ['', '', '', '', '', '', '', '', ''],
       player2Board: ['', '', '', '', '', '', '', '', ''],
-      column1: [0, 3, 6],
-      column2: [1, 4, 7],
-      column3: [2, 5, 8]
+      player1Score: 0,
+      player2Score: 0
     };
   },
   mounted() {
@@ -132,29 +158,6 @@ export default {
     rolled: function () {
       this.currentButton.disabled = true;
       this.currentSection.inert = !this.rolled;
-    },
-    player1Board: function () {
-      // current roll
-      for (let i = 0; i < 3; i++) {
-        // dice in column
-        const dice1_index = i;
-        const dice2_index = i + 3;
-        const dice3_index = dice2 + 3;
-        const player1_dieValues = [
-          this.player1Board[dice1_index],
-          this.player1Board[dice2_index],
-          this.player1Board[dice3_index]
-        ];
-        const player2_dieValues = [
-          this.player2Board[dice1_index],
-          this.player2Board[dice2_index],
-          this.player2Board[dice3_index]
-        ];
-
-        for (let j = i; j < this.player2Board.length; j + 3) {
-
-        }
-      }
     }
   }
 }
