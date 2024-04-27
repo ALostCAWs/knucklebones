@@ -80,9 +80,17 @@ export default {
       }
       this.player1Score = this.setScore(this.player1Board);
       this.player2Score = this.setScore(this.player2Board);
-
       this.rolled = false;
-      this.toggleTurn();
+
+      if (this.player1Board) {
+        this.gameOver = this.checkGameEnd(this.player1Board);
+      } else {
+        this.gameOver = this.checkGameEnd(this.player2Board);
+      }
+
+      if (!this.gameOver) {
+        this.toggleTurn();
+      }
     },
     getColumn: function (i) {
       switch (parseInt(i)) {
@@ -130,6 +138,9 @@ export default {
       addColumnScoreToScore(column1);
       addColumnScoreToScore(column2);
       return score;
+    },
+    checkGameEnd(board) {
+      return board.indexOf('') === -1;
     }
   },
   data() {
@@ -159,6 +170,9 @@ export default {
     rolled: function () {
       this.currentButton.disabled = true;
       this.currentSection.inert = !this.rolled;
+    },
+    gameOver: function () {
+      document.querySelector('.game-container').inert = this.gameOver;
     }
   }
 }
