@@ -3,17 +3,27 @@
     <div class="page-wrapper">
       <h1 class="hiddenHeading">Knucklebones</h1>
       <div class="game-container">
-        <div class="throw-container">
-          <button></button>
+        <div class="player1 throw-container">
+          <button
+          :disabled="!player1Turn"
+            @click="rollDice"
+          >Roll</button>
         </div>
-        <div class="dice-container">
-          <button v-for="index in 9"></button>
+        <div class="player1 dice-container">
+          <button v-for="index in 9"
+            @click="setRollOnBoard"
+          ></button>
         </div>
-        <div class="throw-container">
-          <button></button>
+        <div class="player2 throw-container">
+          <button
+          :disabled="player1Turn"
+            @click="rollDice"
+          >Roll</button>
         </div>
-        <div class="dice-container">
-          <button v-for="index in 9"></button>
+        <div class="player2 dice-container">
+          <button v-for="index in 9"
+            @click="setRollOnBoard"
+          ></button>
         </div>
       </div>
     </div>
@@ -23,9 +33,49 @@
 <script>
 export default {
   name: 'App',
+  methods: {
+    toggleTurn: function () {
+      this.player1Turn = !this.player1Turn;
+      this.setActivePlayerBoard();
+    },
+    setActivePlayerBoard: function () {
+      const player = this.player1Turn ? `1` : `2`;
+      this.currentButton = document.querySelector(`.player${player}.throw-container > button`);
+      this.currentSection = document.querySelector(`.player${player}.dice-container`);
+      document.querySelectorAll(`.dice-container`).forEach((container) => {
+        container.inert = true;
+      });
+    },
+    rollDice: function () {
+      const roll = Math.floor(Math.random() * (7 - 1) + 1);
+      this.currentRoll = roll;
+      this.currentButton.innerHTML = this.currentRoll;
+      this.rolled = true;
+    },
+    setRollOnBoard: function (e) {
+      const dice = e.target;
+      dice.innerHTML = this.currentRoll;
+      this.rolled = false;
+      this.toggleTurn();
+    }
+  },
   data() {
     return {
+      player1Turn: true,
+      rolled: false,
+      currentRoll: null,
+      currentButton: null,
+      currentSection: null
     };
+  },
+  mounted() {
+    this.setActivePlayerBoard();
+  },
+  watch: {
+    rolled: function () {
+      this.currentButton.disabled = true;
+      this.currentSection.inert = !this.rolled;
+    }
   }
 }
 </script>
@@ -48,28 +98,23 @@ h2:not(aside h2) {
 }
 
 button {
-  background-color: var(--accent-color-faded);
-}
-
-button:not(aside button) {
   width: 5em;
   height: 1.5em;
   border: thin solid var(--accent-color);
   border-radius: 5px;
 
+  background-color: var(--accent-color-faded);
   color: var(--accent-color);
 }
 
-button:hover {
+button:hover:not(:disabled) {
+  border: thin solid var(--light-color);
   background-color: var(--accent-color);
 }
 
-button:not(aside button):hover {
-  border: thin solid var(--light-color);
-}
-
-button:hover {
-  color: var(--accent-color-faded);
+.dice-container[inert] button,
+button:disabled {
+  background-color: red;
 }
 
 .game-container {
@@ -86,7 +131,7 @@ button:hover {
   grid-template-columns: repeat(3, 1fr);
 }
 
-.game-container > .dice-container:not(:nth-child(2)) {
+.game-container > .dice-container {
   margin-top: 2em;
 }
 
