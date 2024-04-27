@@ -62,17 +62,47 @@ export default {
     },
     setRollOnBoard: function (e) {
       const dice = e.target;
-      const index = dice.className;
+      const i = dice.className;
+      const column = this.getColumn(i);
 
       if (this.player1Turn) {
-        this.player1Board[index] = this.currentRoll;
+        this.player1Board[i] = this.currentRoll;
+        this.checkColumn(column, this.player2Board);
       } else {
-        this.player2Board[index] = this.currentRoll;
+        this.player2Board[i] = this.currentRoll;
+        this.checkColumn(column, this.player1Board);
       }
 
-      // dice.disabled = true;
       this.rolled = false;
       this.toggleTurn();
+    },
+    getColumn: function (i) {
+      switch (parseInt(i)) {
+        case 0:
+        case 3:
+        case 6:
+          return 0;
+        case 1:
+        case 4:
+        case 7:
+          return 1;
+        case 2:
+        case 5:
+        case 8:
+          return 2;
+      }
+    },
+    checkColumn: function (column, board) {
+      console.log(column);
+      console.log(this.currentRoll);
+      console.log(board);
+      for (let i = column; i < board.length; i += 3) {
+        console.log(i);
+        if (board[i] === this.currentRoll) {
+          board[i] = '';
+        }
+      }
+      console.log(board);
     }
   },
   data() {
@@ -84,7 +114,10 @@ export default {
       currentButton: null,
       currentSection: null,
       player1Board: ['', '', '', '', '', '', '', '', ''],
-      player2Board: ['', '', '', '', '', '', '', '', '']
+      player2Board: ['', '', '', '', '', '', '', '', ''],
+      column1: [0, 3, 6],
+      column2: [1, 4, 7],
+      column3: [2, 5, 8]
     };
   },
   mounted() {
@@ -99,6 +132,29 @@ export default {
     rolled: function () {
       this.currentButton.disabled = true;
       this.currentSection.inert = !this.rolled;
+    },
+    player1Board: function () {
+      // current roll
+      for (let i = 0; i < 3; i++) {
+        // dice in column
+        const dice1_index = i;
+        const dice2_index = i + 3;
+        const dice3_index = dice2 + 3;
+        const player1_dieValues = [
+          this.player1Board[dice1_index],
+          this.player1Board[dice2_index],
+          this.player1Board[dice3_index]
+        ];
+        const player2_dieValues = [
+          this.player2Board[dice1_index],
+          this.player2Board[dice2_index],
+          this.player2Board[dice3_index]
+        ];
+
+        for (let j = i; j < this.player2Board.length; j + 3) {
+
+        }
+      }
     }
   }
 }
@@ -144,7 +200,7 @@ button:hover:not(:disabled),
   grid-template-rows: 50% 50%;
 
   width: 90%;
-  height: 70vh;
+  height: 65vh;
 }
 
 .dice-container {
