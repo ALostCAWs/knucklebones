@@ -141,7 +141,7 @@ export default {
       return score;
     },
     checkGameEnd(board) {
-      return board.indexOf('') !== 0;
+      return board.indexOf('') === -1;
     },
     resetGame() {
       this.rolled = false;
