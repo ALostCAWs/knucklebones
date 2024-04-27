@@ -2,6 +2,15 @@
   <div>
     <div class="page-wrapper">
       <h1 class="hiddenHeading">Knucklebones</h1>
+      <div v-if="gameOver" class="gameOver">
+        <div>
+          <h2>{{ winner }}</h2>
+          <h2>{{ player1Score }} - {{ player2Score }}</h2>
+          <button
+            @click="resetGame"
+          >Reset</button>
+        </div>
+      </div>
       <div class="game-container">
         <div class="player1 throw-container">
           <button
@@ -141,6 +150,17 @@ export default {
     },
     checkGameEnd(board) {
       return board.indexOf('') === -1;
+    },
+    resetGame() {
+      this.player1Turn = true;
+      this.rolled = false;
+      this.currentRoll = null;
+      this.player1Board = ['', '', '', '', '', '', '', '', ''];
+      this.player2Board = ['', '', '', '', '', '', '', '', ''];
+      this.player1Score = 0;
+      this.player2Score = 0;
+      this.gameOver = false;
+      this.setActivePlayerBoard();
     }
   },
   data() {
@@ -155,7 +175,8 @@ export default {
       player2Board: ['', '', '', '', '', '', '', '', ''],
       player1Score: 0,
       player2Score: 0,
-      gameOver: false
+      gameOver: false,
+      winner: null
     };
   },
   mounted() {
@@ -173,6 +194,18 @@ export default {
     },
     gameOver: function () {
       document.querySelector('.game-container').inert = this.gameOver;
+      if (!this.gameOver) {
+        return;
+      }
+      if (this.player1Score > this.player2Score) {
+        this.winner = `Player 1 Wins`;
+        return;
+      }
+      if (this.player1Score < this.player2Score) {
+        this.winner = `Player 2 Wins`;
+        return;
+      }
+      this.winner = `Draw`;
     }
   }
 }
@@ -189,10 +222,6 @@ h1.hiddenHeading {
   clip: rect(1px, 1px, 1px, 1px);
   -webkit-clip-path: inset(0px 0px 99.9% 99.9%);
   clip-path: inset(0px 0px 99.9% 99.9%);
-}
-
-h2:not(aside h2) {
-  padding-bottom: 1em;
 }
 
 button {
@@ -212,13 +241,18 @@ button:hover:not(:disabled),
   color: var(--accent-color-faded);
 }
 
+.page-wrapper {
+  width: 100%;
+  height: 100vh;
+}
+
 .game-container {
   display: grid;
   grid-template-columns: 50% 50%;
   grid-template-rows: 50% 50%;
 
   width: 90%;
-  height: 65vh;
+  height: 45vh;
 }
 
 .dice-container {
@@ -236,5 +270,26 @@ button:hover:not(:disabled),
 
 .throw-container {
   margin: auto;
+}
+
+.gameOver {
+  z-index: 10;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+
+  background: rgb(28, 28, 28);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.486) 0%, rgba(28, 28, 28, 0.436) 100%);
+}
+
+.gameOver > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+  height: 100%;
+  padding-bottom: 25em;
 }
 </style>
